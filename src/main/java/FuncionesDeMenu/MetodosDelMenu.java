@@ -83,7 +83,7 @@ public class MetodosDelMenu {
 				System.out.print(resultSet.getDouble("limite_credito") + "\t");
 				System.out.println();
 			}
-			if (codigoCliente >= clientesTotales) {
+			if (codigoCliente > clientesTotales) {
 				System.out.println("La base de datos contiene " + clientesTotales + " registros.");
 			}
 			ConexionAdmin.cerrarConexion(conexion);
