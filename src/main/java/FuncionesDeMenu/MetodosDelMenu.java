@@ -2,15 +2,16 @@ package FuncionesDeMenu;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import ConectarBBDD.ConexionAdmin;
 import utilidades.Leer;
 
 public class MetodosDelMenu {
 	public static void anadirClientes() {
+		int codigoCliente = 0;
 		System.out.println("Nombre del cliente: ");
 		String nombreCliente = Leer.pedirCadena();
 
@@ -49,16 +50,56 @@ public class MetodosDelMenu {
 
 		System.out.println("Limite de credito: ");
 		double limiteCredito = Leer.pedirDecimal();
+
+		try {
+			Connection conexion = null;
+
+			conexion = DriverManager.getConnection(
+					"jdbc:mysql://localhost:3306/jardineria?useUnicode=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
+					"admin", "4DM1n4DM1n");
+			
+			PreparedStatement preparedStatement = conexion
+					.prepareStatement("insert into cliente values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+
+			preparedStatement.setInt(1, 39);
+			preparedStatement.setString(2, nombreCliente);
+			preparedStatement.setString(3, nombreContacto);
+			preparedStatement.setString(4, apellidoContacto);
+			preparedStatement.setString(5, telefono);
+			preparedStatement.setString(6, fax);
+			preparedStatement.setString(7, lineaDireccion);
+			preparedStatement.setString(8, lineaDireccion2);
+			preparedStatement.setString(9, ciudad);
+			preparedStatement.setString(10, region);
+			preparedStatement.setString(11, pais);
+			preparedStatement.setString(12, codigoPostal);
+			preparedStatement.setInt(13, codigoEmpleadoRepVentas);
+			preparedStatement.setDouble(14, limiteCredito);
+
+			int retorno = preparedStatement.executeUpdate();
+			if (retorno > 0) {
+				System.out.println("Valor insertado correctamente.");
+			}
+			conexion.close();
+		} catch (SQLException sqle) {
+			System.out.println("SQLState: " + sqle.getSQLState() + " SQLErrorCode: " + sqle.getErrorCode());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void mostrarCliente() {
 		System.out.println("¿Que cliente quieres mostrar? (NECESITO NUMERO/S)");
 		int codigoCliente = Leer.pedirEnteroValidar(), clientesTotales = 0;
-		Connection conexion = null;
-		Statement statement = null;
-		ConexionAdmin.abrirConexion(conexion, statement);
+
 		try {
+			Connection conexion = null;
+			conexion = DriverManager.getConnection(
+					"jdbc:mysql://localhost:3306/jardineria?useUnicode=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
+					"admin", "4DM1n4DM1n");
+			Statement statement = conexion.createStatement();
 			ResultSet resultSet = statement.executeQuery("select * from cliente");
+
 			while (resultSet.next()) {
 				clientesTotales++;
 			}
@@ -86,9 +127,9 @@ public class MetodosDelMenu {
 			if (codigoCliente > clientesTotales) {
 				System.out.println("La base de datos contiene " + clientesTotales + " registros.");
 			}
-			ConexionAdmin.cerrarConexion(conexion);
+			conexion.close();
 		} catch (SQLException sqle) {
-			sqle.printStackTrace();
+			System.out.println("No se ha podido acceder a la BBDD.");
 		}
 		System.out.println("--------------------------------------------------------");
 	}
@@ -96,6 +137,7 @@ public class MetodosDelMenu {
 	public static void mostrarTodosLosClientes() {
 		System.out.println("Mostrando clientes...");
 		int clientesTotales = 0;
+
 		try {
 			Connection conexion = null;
 			conexion = DriverManager.getConnection(
@@ -123,7 +165,7 @@ public class MetodosDelMenu {
 			}
 			conexion.close();
 		} catch (SQLException sqle) {
-			sqle.printStackTrace();
+			System.out.println("No se ha podido acceder a la BBDD.");
 		}
 		System.out.println(
 				"Clientes en total: " + clientesTotales + "\n--------------------------------------------------------");
@@ -138,8 +180,9 @@ public class MetodosDelMenu {
 					"jdbc:mysql://localhost:3306/jardineria?useUnicode=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
 					"admin", "4DM1n4DM1n");
 			Statement statement = conexion.createStatement();
-			ResultSet resultSet = statement
-					.executeQuery("select * from cliente where nombre_cliente = '" + cadenaDeTexto + "' or nombre_contacto = '" + cadenaDeTexto + "' or apellido_contacto = '" + cadenaDeTexto + "'");
+			ResultSet resultSet = statement.executeQuery(
+					"select * from cliente where nombre_cliente = '" + cadenaDeTexto + "' or nombre_contacto = '"
+							+ cadenaDeTexto + "' or apellido_contacto = '" + cadenaDeTexto + "'");
 			while (resultSet.next()) {
 				System.out.print(resultSet.getInt("codigo_cliente") + "\t");
 				System.out.print(resultSet.getString("nombre_cliente") + "\t");
@@ -159,7 +202,7 @@ public class MetodosDelMenu {
 			}
 			conexion.close();
 		} catch (SQLException sqle) {
-			sqle.printStackTrace();
+			System.out.println("No se ha podido acceder a la BBDD.");
 		}
 	}
 
