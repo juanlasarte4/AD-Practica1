@@ -5,6 +5,11 @@ import utilidades.Leer;
 
 public class Menu {
 	public static void menu() {
+		System.out.println("Nombre de usuario");
+		String usuario = Leer.pedirCadena();
+		System.out.println("Contrasena: ");
+		String clave = Leer.pedirCadena();
+		
 		int opcion = 0;
 		do {
 
@@ -18,19 +23,19 @@ public class Menu {
 
 			switch (opcion) {
 			case 1:
-				MetodosDelMenu.anadirClientes();
+				MetodosDelMenu.anadirClientes(usuario, clave);
 				break;
 			case 2:
-				MetodosDelMenu.mostrarCliente();
+				MetodosDelMenu.mostrarCliente(usuario, clave);
 				break;
 			case 3:
-				MetodosDelMenu.mostrarTodosLosClientes();
+				MetodosDelMenu.mostrarTodosLosClientes(usuario, clave);
 				break;
 			case 4:
-				MetodosDelMenu.buscarClientes();
+				MetodosDelMenu.buscarClientes(usuario, clave);
 				break;
 			case 5:
-				MetodosDelMenu.editarProducto();
+				MetodosDelMenu.editarProducto(usuario, clave);
 				break;
 			}
 		} while (opcion != 0);

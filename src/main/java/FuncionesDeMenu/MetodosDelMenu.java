@@ -10,8 +10,8 @@ import java.sql.Statement;
 import utilidades.Leer;
 
 public class MetodosDelMenu {
-	public static void anadirClientes() {
-		int codigoCliente = 0;
+	public static void anadirClientes(String usuario, String clave) {
+
 		System.out.println("Nombre del cliente: ");
 		String nombreCliente = Leer.pedirCadena();
 
@@ -51,17 +51,29 @@ public class MetodosDelMenu {
 		System.out.println("Limite de credito: ");
 		double limiteCredito = Leer.pedirDecimal();
 
+		int codigoCliente = 0;
 		try {
-			Connection conexion = null;
-
-			conexion = DriverManager.getConnection(
+			Connection conexion = DriverManager.getConnection(
 					"jdbc:mysql://localhost:3306/jardineria?useUnicode=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
-					"admin", "4DM1n4DM1n");
+					usuario, clave);
+
+			Statement statement = conexion.createStatement();
+			ResultSet resultSet = statement.executeQuery("select codigo_cliente from cliente");
+
+			int comprobarSQLNoExistentes = 0;
+			while (resultSet.next()) {
+				codigoCliente++;
+				if (resultSet.getInt("codigo_cliente") >= codigoCliente) {
+					comprobarSQLNoExistentes++;
+				}
+			}
 			
+			codigoCliente += comprobarSQLNoExistentes;
+
 			PreparedStatement preparedStatement = conexion
 					.prepareStatement("insert into cliente values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
-			preparedStatement.setInt(1, 39);
+			preparedStatement.setInt(1, codigoCliente);
 			preparedStatement.setString(2, nombreCliente);
 			preparedStatement.setString(3, nombreContacto);
 			preparedStatement.setString(4, apellidoContacto);
@@ -78,6 +90,7 @@ public class MetodosDelMenu {
 
 			int retorno = preparedStatement.executeUpdate();
 			if (retorno > 0) {
+
 				System.out.println("Valor insertado correctamente.");
 			}
 			conexion.close();
@@ -88,15 +101,14 @@ public class MetodosDelMenu {
 		}
 	}
 
-	public static void mostrarCliente() {
+	public static void mostrarCliente(String usuario, String clave) {
 		System.out.println("¿Que cliente quieres mostrar? (NECESITO NUMERO/S)");
 		int codigoCliente = Leer.pedirEnteroValidar(), clientesTotales = 0;
 
 		try {
-			Connection conexion = null;
-			conexion = DriverManager.getConnection(
+			Connection conexion = DriverManager.getConnection(
 					"jdbc:mysql://localhost:3306/jardineria?useUnicode=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
-					"admin", "4DM1n4DM1n");
+					usuario, clave);
 			Statement statement = conexion.createStatement();
 			ResultSet resultSet = statement.executeQuery("select * from cliente");
 
@@ -134,15 +146,14 @@ public class MetodosDelMenu {
 		System.out.println("--------------------------------------------------------");
 	}
 
-	public static void mostrarTodosLosClientes() {
+	public static void mostrarTodosLosClientes(String usuario, String clave) {
 		System.out.println("Mostrando clientes...");
 		int clientesTotales = 0;
 
 		try {
-			Connection conexion = null;
-			conexion = DriverManager.getConnection(
+			Connection conexion = DriverManager.getConnection(
 					"jdbc:mysql://localhost:3306/jardineria?useUnicode=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
-					"admin", "4DM1n4DM1n");
+					usuario, clave);
 			Statement statement = conexion.createStatement();
 			ResultSet resultSet = statement.executeQuery("select * from cliente");
 			while (resultSet.next()) {
@@ -171,14 +182,13 @@ public class MetodosDelMenu {
 				"Clientes en total: " + clientesTotales + "\n--------------------------------------------------------");
 	}
 
-	public static void buscarClientes() {
+	public static void buscarClientes(String usuario, String clave) {
 		System.out.println("¿Que cliente desea buscar? (NECESITO TEXTO)");
 		String cadenaDeTexto = Leer.pedirCadena();
 		try {
-			Connection conexion = null;
-			conexion = DriverManager.getConnection(
+			Connection conexion = DriverManager.getConnection(
 					"jdbc:mysql://localhost:3306/jardineria?useUnicode=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
-					"admin", "4DM1n4DM1n");
+					usuario, clave);
 			Statement statement = conexion.createStatement();
 			ResultSet resultSet = statement.executeQuery(
 					"select * from cliente where nombre_cliente = '" + cadenaDeTexto + "' or nombre_contacto = '"
@@ -206,7 +216,7 @@ public class MetodosDelMenu {
 		}
 	}
 
-	public static void editarProducto() {
+	public static void editarProducto(String usuario, String clave) {
 
 	}
 }
