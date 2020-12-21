@@ -60,15 +60,12 @@ public class MetodosDelMenu {
 			Statement statement = conexion.createStatement();
 			ResultSet resultSet = statement.executeQuery("select codigo_cliente from cliente");
 
-			int comprobarSQLNoExistentes = 0;
 			while (resultSet.next()) {
-				codigoCliente++;
 				if (resultSet.getInt("codigo_cliente") >= codigoCliente) {
-					comprobarSQLNoExistentes++;
+					codigoCliente = resultSet.getInt("codigo_cliente");
 				}
 			}
-			
-			codigoCliente += comprobarSQLNoExistentes;
+			codigoCliente++;
 
 			PreparedStatement preparedStatement = conexion
 					.prepareStatement("insert into cliente values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
@@ -88,9 +85,8 @@ public class MetodosDelMenu {
 			preparedStatement.setInt(13, codigoEmpleadoRepVentas);
 			preparedStatement.setDouble(14, limiteCredito);
 
-			int retorno = preparedStatement.executeUpdate();
-			if (retorno > 0) {
-
+			int correcto = preparedStatement.executeUpdate();
+			if (correcto > 0) {
 				System.out.println("Valor insertado correctamente.");
 			}
 			conexion.close();
@@ -99,6 +95,7 @@ public class MetodosDelMenu {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println("--------------------------------------------------------");
 	}
 
 	public static void mostrarCliente(String usuario, String clave) {
@@ -137,7 +134,8 @@ public class MetodosDelMenu {
 				System.out.println();
 			}
 			if (codigoCliente > clientesTotales) {
-				System.out.println("La base de datos contiene " + clientesTotales + " registros.");
+				System.out.println(
+						"La tabla cliente de la base de datos jardineria contiene " + clientesTotales + " registros.");
 			}
 			conexion.close();
 		} catch (SQLException sqle) {
@@ -178,8 +176,8 @@ public class MetodosDelMenu {
 		} catch (SQLException sqle) {
 			System.out.println("No se ha podido acceder a la BBDD.");
 		}
-		System.out.println(
-				"Clientes en total: " + clientesTotales + "\n--------------------------------------------------------");
+		System.out.println("La tabla cliente de la base de datos jardineria contiene: " + clientesTotales
+				+ " registros.\n--------------------------------------------------------");
 	}
 
 	public static void buscarClientes(String usuario, String clave) {
@@ -214,9 +212,80 @@ public class MetodosDelMenu {
 		} catch (SQLException sqle) {
 			System.out.println("No se ha podido acceder a la BBDD.");
 		}
+		System.out.println("--------------------------------------------------------");
 	}
 
 	public static void editarProducto(String usuario, String clave) {
+		System.out.println("¿Que producto quieres editar? (NECESITO TEXTO)");
+		String codigoProducto = Leer.pedirCadena();
 
+		try {
+			Connection conexion = DriverManager.getConnection(
+					"jdbc:mysql://localhost:3306/jardineria?useUnicode=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
+					usuario, clave);
+			Statement statement = conexion.createStatement();
+			ResultSet resultSet = statement
+					.executeQuery("select * from producto where codigo_producto = " + codigoProducto);
+
+			System.out.println("Mostrando producto...");
+			while (resultSet.next()) {
+				System.out.print(resultSet.getString("codigo_producto") + "\t");
+				System.out.print(resultSet.getString("nombre") + "\t");
+				System.out.print(resultSet.getString("gama") + "\t");
+				System.out.print(resultSet.getString("dimensiones") + "\t");
+				System.out.print(resultSet.getString("proveedor") + "\t");
+				System.out.print(resultSet.getString("descripcion") + "\t");
+				System.out.print(resultSet.getInt("cantidad_en_stock") + "\t");
+				System.out.print(resultSet.getDouble("precio_venta") + "\t");
+				System.out.print(resultSet.getDouble("precio_proveedor") + "\t");
+				System.out.println();
+			}
+
+			System.out.println("Nuevo nombre del producto: ");
+			String nuevoNombre = Leer.pedirCadena();
+			
+			System.out.println("Nueva gama del producto: ");
+			String nuevaGama = Leer.pedirCadena();
+			
+			System.out.println("Nuevas dimensiones del producto: ");
+			String nuevasDimensiones = Leer.pedirCadena();
+			
+			System.out.println("Nuevo proveedor del producto: ");
+			String nuevoProveedor = Leer.pedirCadena();
+			
+			System.out.println("Nueva descripcion del producto: ");
+			String nuevaDescripcion = Leer.pedirCadena();
+			
+			System.out.println("Nueva cantidad en stock del producto: ");
+			int nuevaCantidad = Leer.pedirEnteroValidar();
+			
+			System.out.println("Nuevo precio de venta del producto: ");
+			double nuevoPrecioVenta = Leer.pedirDecimal();
+			
+			System.out.println("Nuevo precio de proveedor del producto: ");
+			double nuevoPrecioProveedor = Leer.pedirDecimal();
+			
+			PreparedStatement preparedStatement = conexion
+					.prepareStatement("insert into producto values (?,?,?,?,?,?,?,?,?)");
+
+			preparedStatement.setString(1, codigoProducto);
+			preparedStatement.setString(2, nuevoNombre);
+			preparedStatement.setString(3, nuevaGama);
+			preparedStatement.setString(4, nuevasDimensiones);
+			preparedStatement.setString(5, nuevoProveedor);
+			preparedStatement.setString(6, nuevaDescripcion);
+			preparedStatement.setInt(7, nuevaCantidad);
+			preparedStatement.setDouble(8, nuevoPrecioVenta);
+			preparedStatement.setDouble(9, nuevoPrecioProveedor);
+
+			int correcto = preparedStatement.executeUpdate();
+			if (correcto > 0) {
+				System.out.println("Valor editado correctamente.");
+			}
+			conexion.close();
+		} catch (SQLException sqle) {
+			System.out.println("No se ha podido acceder a la BBDD.");
+		}
+		System.out.println("--------------------------------------------------------");
 	}
 }
